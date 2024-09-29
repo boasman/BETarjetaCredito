@@ -75,15 +75,49 @@ namespace BETarjetaCredito.Controllers
 
         // PUT api/<TarjetaCreditoController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] TarjetaCredito tarjetaCredito)
+        public async Task<IActionResult> Put(int id, [FromBody] TarjetaCredito tarjetaCredito)
         {
+            try
+            {
 
+                if(id != tarjetaCredito.Id)
+                {
+                    return NotFound();
+                }
+
+                _context.tarjetaCreditos.Update(tarjetaCredito);
+                await _context.SaveChangesAsync();
+                return Ok(new {message = "La tarjeta fue actualizada con exito"});  
+
+            }
+            catch (Exception ex)
+            {
+               return BadRequest(ex.Message);
+                
+            }
         }
 
         // DELETE api/<TarjetaCreditoController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            try
+            {
+                var tarjeta = await _context.tarjetaCreditos.FirstOrDefaultAsync(x => x.Id == id);
+                if (tarjeta == null)
+                {
+                    return NotFound();
+                }
+
+                _context.tarjetaCreditos.Remove(tarjeta);
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Tarjeta eliminado con exito" });
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);                
+            }           
         }
     }
 }
